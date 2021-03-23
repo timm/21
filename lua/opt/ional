@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+####
+
+
+Here=$(cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )/..
+
+############# assert dirs exist
+mkdir -p $Here/opt
+mkdir -p $Here/docs
+mkdir -p $Here/src
+
+chmod +x $Here/opt/ional
+
+############# ensure files exist
+f=opt/tmux-conf; [ -f "$Here/$f"  ] || wget -q -O $Here/$f $There/$f
+f=opt/vimrc;     [ -f "$Here/$f"  ] || wget -q -O $Here/$f $There/$f
+f=opt/pics;      [ -f "$Here/$f"  ] || wget -q -O $Here/$f $There/$f
+f=opt/gitignore; [ -f "$Here/$f"  ] || wget -q -O $Here/$f $There/$f
+f=gitignore;     [ -f "$Here/.$f" ] || cp $Here/opt/$f $Here/.$f
+
+git add $Here/opt/* $Here/.gitignore
+
+############## aliases
+alias gp="git add *; git commit -am saving; git push; git status"
+alias ls="ls -G"
+alias tmux="$(which tmux) -f $Here/opt/tmux-conf "
+alias vi="vim -u $Here/opt/vimrc "
+alias vims="vim +PluginInstall +qall"         
+
+here() { cd $1; basename `pwd`; }
+
+hi() {
+  clear
+  tput bold; tput setaf 32; cat <<-'EOF'
+
+         _.._
+       .' .-'`
+      /  /
+      |  |
+      \  \
+jgs    '._'-._
+          ```
+EOF
+  tput sgr0
+  tput bold; tput setaf 0
+  awk '/^alias/ {print $0}'   $Here/opt/ional
+  echo ""
+  tput sgr0
+}
+
+mytmux() {
+  session=$RANDOM
+  Tmux=$(which tmux)
+  $Tmux start-server
+  sleep 1
+  $Tmux new-session -d -s $session  
+  $Tmux send-keys ". $Here/opt/ional"  C-m  "sleep 0.5; clear; vi keys.lisp" C-m
+
+  $Tmux splitw -h -p 20
+  $Tmux selectp -t 1
+  $Tmux send-keys ".  $Here/opt/ional"  C-m  "clear; hi" C-m
+
+  $Tmux splitw -v  -p 5
+  $Tmux selectp -t 2
+  $Tmux send-keys ".  $Here/opt/ional"  C-m  "htop"  C-m
+
+  $Tmux attach-session -t $session
+}
+
+startup() {
+  if [ ! -d "$HOME/.vim/bundle" ]; then
+     git clone https://github.com/VundleVim/Vundle.vim.git \
+           ~/.vim/bundle/Vundle.vim
+     vims
+  fi
+  [ -z "$TMUX" ] && mytmux
+}
+############### prompt
+PROMPT_COMMAND='echo -ne "🌙 $(git branch 2>/dev/null | grep '^*' | colrm 1 2):";PS1="$(here ..)/$(here .):\!\e[m ▶ "'
+
+[[ $1 == "-s" ]] && startup
+
+
