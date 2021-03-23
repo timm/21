@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ####
 
-
+There="https://raw.githubusercontent.com/timm/21/main"
 Here=$(cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )/..
 
 ############# assert dirs exist
@@ -26,6 +26,12 @@ alias ls="ls -G"
 alias tmux="$(which tmux) -f $Here/opt/tmux-conf "
 alias vi="vim -u $Here/opt/vimrc "
 alias vims="vim +PluginInstall +qall"         
+
+docs() {
+  mkdir -p $Here/docs
+  (cd $Here/src; pycco -d $Here/docs *.lua)
+  cp $Here/opt/pycco.css $Here/docs
+}
 
 here() { cd $1; basename `pwd`; }
 
@@ -54,7 +60,7 @@ mytmux() {
   $Tmux start-server
   sleep 1
   $Tmux new-session -d -s $session  
-  $Tmux send-keys ". $Here/opt/ional"  C-m  "sleep 0.5; clear; vi keys.lisp" C-m
+  $Tmux send-keys ". $Here/opt/ional"  C-m  "sleep 0.5; clear; " C-m
 
   $Tmux splitw -h -p 20
   $Tmux selectp -t 1
