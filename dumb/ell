@@ -1,0 +1,5 @@
+# vim: ft=awk ts=2 sw=2 et :
+
+chmod +x auk
+bash --init-file opt/ional -i
+ 
