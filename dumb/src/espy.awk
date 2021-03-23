@@ -58,40 +58,51 @@ function SymAdd(i,x,   tmp) {
 function Row(i,a,t,      c) {
   List(i)
   i.is="Row"
+  i.id = ID++
   has(i,"cells") 
+  for(c in t.ys) i.w[c] = t.cols[c].w
   for(c in a) i.cells[c] = add(t.cols[c], a[c]) }
 
 function RowSome(i,cols,a,   c) { for(c in cols) a[c] = i.cells[c] }
 
-function RowBetter(i,j, tab,    n,s1,s2,c,w,a,b) {
-  n=length(tab.ys)
+function RowBetter(i,j,    n,s1,s2,c,w,a,b) {
+  n=length(i.w)
   s1=s2=0
-  for(c in tab.ys) {
-    w = tab.cols[c].w
+  for(c in i.w) {
+    w = i.w[c]
     a = NumNorm(tab.cols[c], i.cells[c])
     b = NumNorm(tab.cols[c], j.cells[c])
     s1 -= 2.718^(w*(a-b)/n)
     s2 -= 2.718^(w*(b-a)/n) }
   return s1/n < s2/n }
 
+function RowCompare(_, row1,__,row2) {
+  if (row1.id == row2.id) return 0
+  if (RowBetter
 #------------------------------------------
 function Tab(i,f) {
   List(i)
   i.is = "Tab"
-  has(i,"rows"); has(i,"cols"); has(i,"xs"); has(i,"ys") 
+  has(i,"rows"); has(i,"cols"); has(i,"xs"); has(i,"ys"); has(i,"header")
   if (f) TabRead(i,f) }
 
 function TabSome(i,cols,a, c) { for(c in cols) a[c] = mid(i.cols[c]) }
 function TabRead(i,f,a)       { while(csv(a,f)) TabAdds(i,a) }
 function TabAdds(i,a)         { length(i.cols) ? TabRow(i,a) : TabHeaders(i,a) }
-function TabRow(i,a,     c,r) { moRE(i.rows,"Row",a,i) }
+function TabRow(i,a)          {
+  "is" in a ?  moRE(i.rows,"Row",a.cells ,i)  : moRE(i.rows,"Row",a,i) }
 
 function TabHeaders(i,a,   at,txt,what) {
   for(at in a) {
     txt  = a[at]
+    i.header[at] = txt
     what = (txt ~ /\?/) ? "Skip" : ((txt ~ /^[A-Z]/) ? "Num" : "Sym")
     moRE(i.cols, what, at,txt)
     if (what != "Skip")
        txt ~/[-!\+]/ ? i.ys[at] : i.xs[at]  }}
 
+function TabClone(i,j, inits,      r) {
+  Tab(j)
+  TabHeader(j, i.header)
+  for(r in inits) TabRow(i, inits[r]) }
 
