@@ -13,8 +13,7 @@ function Col(i,at,txt) {
   i.at = at ? at : 0 }
 
 #------------------------------------------
-function Skip(i,at,txt) { Col(i,at,txt); i.is="Skip" }
-
+function Skip(i,at,txt)  { Col(i,at,txt); i.is="Skip" }
 function SkipAdd(i,x)    { return x }
 
 #------------------------------------------
@@ -24,6 +23,9 @@ function Num(i,at,txt) {
   i.w  = txt ~ /-/ ? -1 : 1
   i.lo =  10^32
   i.hi = -10^32 }
+
+function NumNorm(i,x) { return (x - i.lo)/(i.hi - i.lo + 1E-32) }
+function NumMid(i)    { return i.mu }
 
 function NumAdd(i,x,   d) {
   x += 0
@@ -35,8 +37,6 @@ function NumAdd(i,x,   d) {
   if (x > i.hi) i.hi = x 
   return x }
 
-function NumNorm(i,x) { return (x - i.lo)/(i.hi - i.lo + 1E-32) }
-function NumMid(i)    { return i.mu }
 #------------------------------------------
 function Sym(i,at,txt) {  
   Col(i,at,txt)
@@ -45,6 +45,8 @@ function Sym(i,at,txt) {
   i.mode=""
   i.most=0 }
 
+function SymMid(i)    { return i.mode }
+
 function SymAdd(i,x,   tmp) {
   tmp = i.seen[x] = i.seen[x] + 1
   if (tmp> i.most) {
@@ -52,14 +54,14 @@ function SymAdd(i,x,   tmp) {
     i.mode = x }
   return x}
 
-function SymMid(i)    { return i.mode }
-
 #------------------------------------------
 function Row(i,a,t,      c) {
   List(i)
   i.is="Row"
   has(i,"cells") 
   for(c in a) i.cells[c] = add(t.cols[c], a[c]) }
+
+function RowSome(i,cols,a,   c) { for(c in cols) a[c] = i.cells[c] }
 
 function RowBetter(i,j, tab,    n,s1,s2,c,w,a,b) {
   n=length(tab.ys)
@@ -72,8 +74,6 @@ function RowBetter(i,j, tab,    n,s1,s2,c,w,a,b) {
     s2 -= 2.718^(w*(b-a)/n) }
   return s1/n < s2/n }
 
-function RowSome(i,cols,a,   c) { for(c in cols) a[c] = i.cells[c] }
-
 #------------------------------------------
 function Tab(i,f) {
   List(i)
@@ -81,7 +81,10 @@ function Tab(i,f) {
   has(i,"rows"); has(i,"cols"); has(i,"xs"); has(i,"ys") 
   if (f) TabRead(i,f) }
 
-function TabRead(i,f,a) { while(csv(a,f)) TabAdds(i,a) }
+function TabSome(i,cols,a, c) { for(c in cols) a[c] = mid(i.cols[c]) }
+function TabRead(i,f,a)       { while(csv(a,f)) TabAdds(i,a) }
+function TabAdds(i,a)         { length(i.cols) ? TabRow(i,a) : TabHeaders(i,a) }
+function TabRow(i,a,     c,r) { moRE(i.rows,"Row",a,i) }
 
 function TabHeaders(i,a,   at,txt,what) {
   for(at in a) {
@@ -90,12 +93,5 @@ function TabHeaders(i,a,   at,txt,what) {
     moRE(i.cols, what, at,txt)
     if (what != "Skip")
        txt ~/[-!\+]/ ? i.ys[at] : i.xs[at]  }}
-
-function TabRow(i,a,     c,r) { moRE(i.rows,"Row",a,i) }
-
-function TabAdds(i,a) { length(i.cols) ?  TabRow(i,a) : TabHeaders(i,a)  }
-
-function TabSome(i,cols,a,  c) { for(c in cols) a[c] = mid(i.cols[c]) }
-
 
 
