@@ -24,6 +24,21 @@ function m.add(t1,t2,   t3)
 function m.has(x,t)
   for _,y in pairs(t) do if y==x then return true end end end
 
+-- Returns all combinations of  `s`
+function m.powerset(s)
+  local t = {{}}
+  for i = 1, #s do
+    for j = 1, #t do t[#t+1] = {s[i],table.unpack(t[j])} end end
+  return t
+end
+
+-- Time a function
+function m.watch(f,n)
+  n = n or 10
+  local x = os.clock()
+  for _ = 1,n do f() end
+  m.printf("%5.4f secs", (os.clock() - x)/n) end
+
 -- Split the string `s` on separator `c`, defaults to "." 
 function m.split(s,     c,t)
   t, c = {}, c or ","
@@ -59,6 +74,9 @@ function m.order(t,  i,keys)
   return function ()
     if i < #keys then
       i=i+1; return keys[i], t[keys[i]] end end end 
+
+-- "C"-like printf
+function m.printf(...) print(string.format(...)) end
 
 -- Simple print of a flat table
 function m.o(z,pre) print(m.ooo(z,pre)) end
