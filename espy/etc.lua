@@ -61,12 +61,12 @@ function m.order(t,  i,keys)
       i=i+1; return keys[i], t[keys[i]] end end end 
 
 -- Simple print of a flat table
-function m.o(z,pre) print(ooo(z,pre)) end
+function m.o(z,pre) print(m.ooo(z,pre)) end
 
 -- Simple translation table to string.
 function m.ooo(z,pre,   s,c) 
   s, c = (pre or "")..'{', ""
-  for _,v in order(z or {}) do s= s..c..tostring(v); c=", " end
+  for _,v in m.order(z or {}) do s= s..c..tostring(v); c=", " end
   return s..'}' end
 
 -- Nested translation table to string.
@@ -95,6 +95,7 @@ function m.rogues(    ignore,match)
     os=1, io=1, bit32=1, string=1, arg=1, debug=1, _VERSION=1, _ENV=1, _G=1,
     tonumber=1, next=1, print=1, collectgarbage=1, xpcall=1, rawset=1,
     load=1, rawequal=1, tostring=1, assert=1, _assert=1, ipairs=1,
+    warn=1,
     setmetatable=1, type=1, loadfile=1, require=1, error=1, rawlen=1,
     getmetatable=1, pcall=1, dofile=1, select=1, rawget=1, pairs=1}
   for k,v in pairs( _ENV ) do
