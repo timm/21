@@ -1,19 +1,22 @@
 #!/usr/bin/env lua
 -- vim: ts=2 sw=2 et :
-lib=require "lib"
+lib=require "etc"
+
 
 local Col = {at=0, txt=""}
 local Sym = {at=0, txt="", n=0, most=0, seen={}}
 local Num = {at=0, txt="", n=0, mu=0, sd=0, m2=0, lo=1e32,  hi=-1e32, _all={}}
 local Skip= {at=0, txt="", n=0}
 local Row = {cells={}} 
-local Tab = {rows={}, txt="", cols={}, xs={}, ys={}}
+local Rows = {rows={}, txt="", cols={}, xs={}, ys={}}
 
-local function goalp(s, c) c=s:sub(1,1); return lib"+"==c or "-"==c or "!"==s end
-local function nump(s)    return s:sub(1,1):match("[A-Z]") end
-local function weight(s)  return s:find("<") and -1 or 1 end
-local function skip(s)    return s:find("?") end
-local function what(s)    return skip(s) and Skip or (nump(s) and Num or Sym) end
+local goalp, nump, weight, skip, what, col, add
+
+function goalp(s, c) c=s:sub(1,1); return lib"+"==c or "-"==c or "!"==s end
+function nump(s)    return s:sub(1,1):match("[A-Z]") end
+function weight(s)  return s:find("<") and -1 or 1 end
+function skip(s)    return s:find("?") end
+function what(s)    return skip(s) and Skip or (nump(s) and Num or Sym) end
 
 function col(at,txt, inits)
   new =  lib.isa(what(txt),{at=at,txt=txt,w=weight(txt)}) 
@@ -55,7 +58,7 @@ function Num:mid(x) return self.mu end
 function Num:spread(x) return self.sd end
 
 -------------------------------------
-function Tab:add(t) 
+function Rows:add(t) 
   t = t._isa==Row and t.calls or t
   if #t.cols>0 then
     for at,v in pairs(t) do add(t.cols[at], v) end 
@@ -66,3 +69,6 @@ function Tab:add(t)
       what = goalp(v) and t.ys or t.xs
       what[#what+1] = new
       t.cols[#t.cols + 1] = new end end end
+
+return {Col=Col, Sym=Sym, Num=Num,
+        Row=Row, Rows=Rows}
