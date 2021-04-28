@@ -110,7 +110,7 @@ function m.csv(file,     stream,tmp,t)
     if tmp then
       tmp = tmp:gsub("[\t\r ]*","") -- no whitespace
                :gsub("#.*","") -- no comemnts
-      t   = split(tmp) 
+      t   = m.split(tmp) 
       tmp = io.read()
       if #t > 0 then 
         for j,x in pairs(t) do t[j] = tonumber(x) or x end

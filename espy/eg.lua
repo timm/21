@@ -19,4 +19,8 @@ local t2=lib.copy(t1)
 t1[2][1]=30
 assert(t2[2][1] == 20)
 
-
+local n=0
+for row in lib.csv("data/auto93.csv") do 
+  n=n+1
+  if n>1 then 
+    assert("number"==type(row[1]),tostring(n))  end end 
