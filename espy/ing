@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
-Ing=$(cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )
+Ful=$(cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )
 
 ############# assert dirs exist
-mkdir -p $Ing/etc
-mkdir -p $Ing/src
-mkdir -p $Ing/docs
-f=$Ing/docs/.nojekyll; [[ -f "$f" ]] || touch $f 
+mkdir -p $Ful/etc
+mkdir -p $Ful/src
+mkdir -p $Ful/docs
+f=$Ful/docs/.nojekyll; [[ -f "$f" ]] || touch $f 
 
 docs() {
-  (cd $Ing/src;  pycco  -d $Ing/docs *.lua)
-  cp $Ing/etc/pycco.css $Ing/docs
+  (cd $Ful/src;  pycco  -d $Ful/docs *.lua)
+  cp $Ful/etc/pycco.css $Ful/docs
 } 
 
 alias gp="git add *;git commit -am save;git push;git status"
 alias ls="ls -G"
-alias tmux="$(which tmux) -f $Ing/etc/tmux-conf "
-alias vi="vim -u $Ing/etc/vimrc "
+alias tmux="$(which tmux) -f $Ful/etc/tmux-conf "
+alias vi="vim -u $Ful/etc/vimrc "
 alias vims="vim +PluginInstall +qall"         
 
 here() { cd $1; basename `pwd`; }
