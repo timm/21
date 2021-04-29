@@ -1,10 +1,10 @@
 #!/usr/bin/env lua
 -- vim: ts=2 sw=2 et :
 
---- Misc lua routines.
--- @module etc
--- @author Tim Menzies
--- @license 2021, MIT
+-- Misc lua routines.   
+-- Tim Menzies, (c) 2021, MIT
+-- [index](index)
+-- ---------------------------------------------
 
 local m={}
 
