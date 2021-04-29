@@ -4,8 +4,14 @@ Ing=$(cd $( dirname "${BASH_SOURCE[0]}" ) && pwd )
 
 ############# assert dirs exist
 mkdir -p $Ing/etc
-mkdir -p $Ing/docs
 mkdir -p $Ing/src
+mkdir -p $Ing/docs
+f=$Ing/docs/.nojekyll; [[ -f "$f" ]] || touch $f 
+
+docs() {
+  (cd $Ing/src;  pycco  -d $Ing/docs *.lua)
+  cp $Ing/etc/pycco.css $Ing/docs
+} 
 
 alias gp="git add *;git commit -am save;git push;git status"
 alias ls="ls -G"
@@ -16,6 +22,3 @@ alias vims="vim +PluginInstall +qall"
 here() { cd $1; basename `pwd`; }
 
 PROMPT_COMMAND='echo -ne "🌙 $(git branch 2>/dev/null | grep '^*' | colrm 1 2):";PS1="$(here ..)/$(here .):\!\e[m ▶ "'
-
-
-
