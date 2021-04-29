@@ -1,51 +1,51 @@
 #!/usr/bin/env lua
 -- vim: ts=2 sw=2 et :
-local m={}
-m.Of={
-  synopsis= "Misc lua routines",
-  author  = "Tim Menzies, timm@ieee.org",
-  license = "MIT",
-  year    = 2021 }
 
--- Return something, unchanged
+--- Misc lua routines.
+-- @module etc
+-- @author Tim Menzies
+-- @license 2021, MIT
+
+local m={}
+
+---- Return something, unchanged
 function m.same(x) return x end
 
--- Return any item in a list
+---- Return any item in a list
 function m.any(a) return a[1 + math.floor(#a*math.random())] end
 
--- Return t1 with t2 added in.
+--- Return t1 with t2 added in.
 function m.add(t1,t2,   t3)
   t3 = {}
   for _,y in pairs(t1) do t3[#t3+1]= m.copy(y) end
   for _,y in pairs(t2) do t3[#t3+1]= m.copy(y) end
   return t3 end
 
--- Returns t if x is in t
+--- Returns t if x is in t
 function m.has(x,t)
   for _,y in pairs(t) do if y==x then return true end end end
 
--- Returns all combinations of  `s`
+--- Returns all combinations of  `s`
 function m.powerset(s)
   local t = {{}}
   for i = 1, #s do
     for j = 1, #t do t[#t+1] = {s[i],table.unpack(t[j])} end end
-  return t
-end
+  return t end
 
--- Time a function
+--- Time a function
 function m.watch(f,n)
   n = n or 10
   local x = os.clock()
   for _ = 1,n do f() end
   m.printf("%5.4f secs", (os.clock() - x)/n) end
 
--- Split the string `s` on separator `c`, defaults to "." 
+--- Split the string `s` on separator `c`, defaults to "." 
 function m.split(s,     c,t)
   t, c = {}, c or ","
   for y in string.gmatch(s, "([^" ..c.. "]+)") do t[#t+1] = y end
   return t end
 
--- Deep copy
+--- Deep copy
 function m.copy(obj,   old,new)
   if type(obj) ~= 'table' then return obj end
   if old and old[obj] then return old[obj] end
@@ -54,7 +54,7 @@ function m.copy(obj,   old,new)
   for k, v in pairs(obj) do new[k] = m.copy(v, old) end
   return new end
 
--- Object creation, add a unique id, bind to metatable, maybe set some initial values.
+--- Object creation, add a unique id, bind to metatable, maybe set some initial values.
 m._id=0
 function m.isa(klass,inits,      new)
   new = m.copy(klass or {})
@@ -66,7 +66,7 @@ function m.isa(klass,inits,      new)
   new._isa = klass
   return new end 
 
--- Iterate on keys in sorted order
+--- Iterate on keys in sorted order
 function m.order(t,  i,keys)
   i,keys = 0,{}
   for key,_ in pairs(t) do keys[#keys+1] = key end
@@ -75,19 +75,19 @@ function m.order(t,  i,keys)
     if i < #keys then
       i=i+1; return keys[i], t[keys[i]] end end end 
 
--- "C"-like printf
+--- "C"-like printf
 function m.printf(...) print(string.format(...)) end
 
--- Simple print of a flat table
+--- Simple print of a flat table
 function m.o(z,pre) print(m.ooo(z,pre)) end
 
--- Simple translation table to string.
+--- Simple translation table to string.
 function m.ooo(z,pre,   s,c) 
   s, c = (pre or "")..'{', ""
   for _,v in m.order(z or {}) do s= s..c..tostring(v); c=", " end
   return s..'}' end
 
--- Nested translation table to string.
+--- Nested translation table to string.
 -- Don't show private slots (those that start with `_`);
 -- show slots in sorted order;
 -- if `pre` is specified, then  print that as a prefix.
@@ -106,7 +106,7 @@ function m.oo(t,pre,    indent,fmt)
           else
             print(fmt .. tostring(v)) end end end end end end
 
--- Warn about locals that have escaped into the global space
+--- Warn about locals that have escaped into the global space
 function m.rogues(    ignore,match)
   ignore = {
     jit=1, utf8=1,math=1, package=1, table=1, coroutine=1, bit=1, 
@@ -120,7 +120,7 @@ function m.rogues(    ignore,match)
     if  not ignore[k] then
       print("-- warning, rogue variable ["..k.."]") end end end 
 
--- Return each row, split on ",", numstrings coerced to numbers,
+--- Return each row, split on ",", numstrings coerced to numbers,
 -- kills comments and whitespace.
 function m.csv(file,     stream,tmp,t)
   stream = file and io.input(file) or io.input()
@@ -137,6 +137,6 @@ function m.csv(file,     stream,tmp,t)
     else
       io.close(stream) end end end
 
------
+---
 -- Any finally...
 return m

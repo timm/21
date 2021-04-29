@@ -2,11 +2,11 @@
 -- vim: ts=2 sw=2 et :
 local eg={}
 
-local lib=require "etc"
-local col=require "col"
+local lib  = require "etc"
+local data = require "data"
 local powerset,watch,csv = lib.powerset,lib.watch,lib.csv
-local isa,oo =  lib.isa,lib.oo
-local add = col.add
+local isa,oo             = lib.isa,lib.oo
+local add = data.add
 math.randomseed(1)
 
 -------------
@@ -35,17 +35,17 @@ for row in lib.csv("data/auto93.csv") do
 end 
 
 ------------
-local t={10,20,30,40,50,60,70,80,
-         90,100,110,120,130,140,150}
+local t={10,20,30,40,50,60,70,80,90,100,110,120,130,140,150}
 watch(function() powerset(t) end)
 
 -------------
-local rows=isa(col.Rows)
+local rows=isa(data.Rows)
 for row in csv("data/auto93.csv") do rows:add(row) end
-oo(rows.cols[2])
+assert(rows.cols[1].n == 398)
+assert(rows.cols[3].n == 397)
 
 --------------
-local n = isa(col.Num)
+local n = isa(data.Num)
 for _,v in pairs {600, 470, 170, 430, 300} do add(n,v) end
 assert(n.mu==394)
 assert(147.3 < n.sd and n.sd < 147.4)
