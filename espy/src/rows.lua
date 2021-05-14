@@ -1,9 +1,10 @@
 #!/usr/bin/env lua
 -- vim: ts=2 sw=2 et :
 
--- Storage for rows, summarized in columns.  
--- Tim Menzies, (c) 2021, MIT
--- [index](index)
+-- Storage for rows, summarized in columns.    
+-- Tim Menzies, (c) 2021, MIT     
+-- [index](index.html)
+
 -- ---------------------------------------------
 
 local lib  = require "lib"
@@ -13,7 +14,6 @@ local Num  = require "num"
 
 local goalp,klassp,nump,weight,skip,what,col,add
 
--- -------------------------------
 -- ## Functions
 
 -- Is `s` the name of a goal column?
@@ -44,6 +44,9 @@ function col(at,txt, inits)
 function add(col,x) if x~="?" then col.n = col.n+1; col:add(x) end end
 
 -- -----------------------------------
+-- ## Rows
+-- Holder for rows, summarized in columns.
+
 local Rows= {rows={}, txt="", cols={}, xs={}, ys={}}
 
 function Rows:add(t) 
@@ -59,6 +62,9 @@ function Rows:add(t)
       if klassp(v) then self.klass= new end
       where[#where+1] = new
       self.cols[#self.cols + 1] = new end end end
+
+-- -----------------------------------
+-- And finally...
 
 return {add=add, Sym=Sym, Num=Num,
         Row=Row, Rows=Rows}

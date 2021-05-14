@@ -1,9 +1,10 @@
 #!/usr/bin/env lua
 -- vim: ts=2 sw=2 et :
 
--- Unit tests.
--- Tim Menzies, (c) 2021, MIT
--- [index](index)
+-- Unit tests.   
+-- Tim Menzies, (c) 2021, MIT    
+-- [index](index.html)
+
 -- ---------------------------------------------
 
 local lib  = require "lib"
@@ -54,6 +55,10 @@ function eg.num()
   for _,v in pairs {600, 470, 170, 430, 300} do add(n,v) end
   assert(n.mu==394)
   assert(147.3 < n.sd and n.sd < 147.4) end
+
+
+-- -----------------------------------
+-- And finally...
 
 for txt,f in lib.order(eg) do print("-- "..txt); f(); end
 lib.rogues()

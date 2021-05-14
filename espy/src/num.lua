@@ -1,9 +1,10 @@
 #!/usr/bin/env lua
 -- vim: ts=2 sw=2 et :
 
--- Column to summarize `Num`eric columns.    
--- Tim Menzies, (c) 2021, MIT
--- [index](index)
+-- Column to summarize `Num`eric columns.       
+-- Tim Menzies, (c) 2021, MIT    
+-- [index](index.html)
+
 -- ---------------------------------------------
 
 local Num = {at=0, txt="", n=0, mu=0, sd=0, m2=0, 
@@ -22,5 +23,8 @@ function Num:add(x)
 
 function Num:mid(x) return self.mu end
 function Num:spread(x) return self.sd end
+
+-- -----------------------------------
+-- And finally...
 
 return Num
