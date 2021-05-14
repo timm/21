@@ -27,6 +27,6 @@ class Sym extends Col
 class Num extends Col
    new: (txt,at) =>
      super txt,at
-     @mu, @sd, @m2, @lo, @hi, @all = 0,0,0, math.inf, -math.inf,{}
+     @mu,@sd,@m2,@lo,@hi,@all = 0,0,0,math.inf,-math.inf,{}
  
 {:Sym, :Num}
