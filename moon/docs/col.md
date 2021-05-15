@@ -1,17 +1,26 @@
---
+# col.moon 
+
+
+```moonscript
 moon=require "moon"
 p=moon.p
+```
 
--- -----------------------------------------
+-----------------------------------------
+
+```moonscript
 weight= (s)-> if s\find"-" then -1  else 1
 isKlass=(s)-> s\find"!"
 isSkip= (s)-> s\find"?"
 isNum=  (s)-> s\match"^[A-Z]"
 isY=    (s)-> s\find"+" or s\find"-" or isKlass s 
 isX=    (s)-> not isY s
+```
 
--- Read a comma operated file, kill space and comments,
--- convert some strings to numerics. 
+Read a comma operated file, kill space and comments,
+convert some strings to numerics. 
+
+```moonscript
 csv= (file)->
   stream = io.input(file)
   =>
@@ -20,11 +29,17 @@ csv= (file)->
       [(tonumber(y) or y) for y in x\gmatch("([^,]+)")]
     else
       io.close(stream) and nil
+```
 
--- Print something, then return it.
+Print something, then return it.
+
+```moonscript
 say= (s,x) -> print(s,x) and x
+```
 
--- ----------------------------
+----------------------------
+
+```moonscript
 class Col
   new: (at=1,txt='') => 
     @n, @at, @txt, @w = 1, at, txt, weight(txt)
@@ -33,7 +48,11 @@ class Col
    if x != "?" 
      @n += 1
      @\add1 x
--- ---------------------------
+```
+
+---------------------------
+
+```moonscript
 class Sym extends Col
    new: (at,txt) =>
      super at,txt
@@ -46,13 +65,20 @@ class Sym extends Col
      e
    mid: => @mode
    spread: => @\ent!
--- ---------------------------
--- Anything sent to `Skip` just gets ignored.
+```
+
+---------------------------
+Anything sent to `Skip` just gets ignored.
+
+```moonscript
 class Skip extends Col
   add1: (x) => x
+```
 
--- ---------------------------
--- Summarize numeric columns
+---------------------------
+Summarize numeric columns
+
+```moonscript
 class Num extends Col
   new: (at,txt) =>
     @mu,@sd,@m2,@lo,@hi = 0,0,0,1E32,-1E32
@@ -65,8 +91,11 @@ class Num extends Col
     @sd  = (@n<2 and 0 or (@m2<0 and 0 or @m2/@n))^0.5
     @lo  = x if x < @lo
     @hi  = x if x > @hi
+```
 
-------------------------------
+----------------------------
+
+```moonscript
 class Cols
   new:(t)  =>
     @xs,  @ys, @all, @klass = {},{},{},nil
@@ -83,8 +112,11 @@ class Cols
   add: (a) => 
    for col in *@all do col\add a[col.at]
    a
+```
 
-------------------------------
+----------------------------
+
+```moonscript
 class Data
   new:(a={}) =>
     @rows, @cols = {}, nil
@@ -96,6 +128,10 @@ class Data
     out = Rows [col.txt for col in *@cols.all] 
     for x in *a do out\add x
     out
+```
 
-------------------------------------
+----------------------------------
+
+```moonscript
 :csv, :Data, :Cols,:Sym, :Skip, :Num
+```
