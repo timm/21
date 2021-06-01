@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>espy.lua</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>espy.lua</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <hr />
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span><span class="kd">local</span> <span class="n">Of</span>  <span class="o">=</span> <span class="p">{</span>         
+  <span class="n">synopois</span> <span class="o">=</span> <span class="s2">&quot;`Col`s summarize  columns of data&quot;</span><span class="p">,</span>
+  <span class="n">author</span>  <span class="o">=</span> <span class="s2">&quot;Tim Menzies, timm@ieee.org&quot;</span><span class="p">,</span>
+  <span class="n">license</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span><span class="p">,</span>
+  <span class="n">year</span>    <span class="o">=</span> <span class="mi">2020</span><span class="p">,</span>
+  <span class="n">seed</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>     
+  <span class="n">ch</span>      <span class="o">=</span> <span class="p">{</span><span class="n">skip</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">klass</span><span class="o">=</span><span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="n">more</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">less</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">}}</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <h2>Objects</h2>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kd">local</span> <span class="n">Col</span>  <span class="o">=</span> <span class="p">{}</span>
+<span class="kd">local</span> <span class="n">Num</span><span class="o">=</span> <span class="p">{</span><span class="n">ako</span><span class="o">=</span><span class="s2">&quot;Num&quot;</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">txt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">m2</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sd</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">lo</span><span class="o">=</span><span class="nb">math.huge</span><span class="p">,</span><span class="n">hi</span><span class="o">=</span> <span class="o">-</span><span class="nb">math.huge</span><span class="p">}</span>
+<span class="kd">local</span> <span class="n">Sym</span>  <span class="o">=</span> <span class="p">{</span><span class="n">ako</span><span class="o">=</span><span class="s2">&quot;Sym&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">txt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seen</span><span class="o">=</span><span class="p">{},</span> <span class="n">most</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="kc">true</span><span class="p">}</span>
+<span class="kd">local</span> <span class="n">Skip</span> <span class="o">=</span> <span class="p">{</span><span class="n">ako</span><span class="o">=</span><span class="s2">&quot;Skip&quot;</span><span class="p">}</span>
+<span class="kd">local</span> <span class="n">Tab</span>  <span class="o">=</span> <span class="p">{</span><span class="n">ako</span><span class="o">=</span><span class="s2">&quot;Tab&quot;</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="p">{},</span> <span class="n">cols</span><span class="o">=</span><span class="p">{},</span> <span class="n">xs</span><span class="o">=</span><span class="p">{},</span> <span class="n">ys</span><span class="o">=</span><span class="p">{}}</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <h2>Shortcuts</h2>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kd">local</span> <span class="n">Lib</span>  <span class="o">=</span> <span class="nb">require</span> <span class="s2">&quot;lib&quot;</span>    
+<span class="kd">local</span> <span class="n">isa</span>  <span class="o">=</span> <span class="n">Lib</span><span class="p">.</span><span class="n">isa</span>
+<span class="kd">local</span> <span class="kr">function</span> <span class="nf">cell</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="kr">return</span> <span class="ow">not</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;string&quot;</span> <span class="ow">and</span> <span class="n">x</span><span class="o">==</span><span class="s2">&quot;?&quot;</span><span class="p">)</span> <span class="kr">end</span>
+
+<span class="kr">function</span> <span class="nc">Col</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">txt</span><span class="p">,</span><span class="n">t</span><span class="p">)</span> 
+  <span class="n">what</span><span class="o">=</span> <span class="p">(</span><span class="n">txt</span><span class="p">:</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^%u&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">Num</span> <span class="ow">or</span> <span class="n">Sym</span><span class="p">).</span><span class="n">new</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">txt</span><span class="p">)</span>
+  <span class="kr">if</span> <span class="n">txt</span><span class="p">:</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot; </span>
+<span class="s2">  </span>
+<span class="s2">end</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>
