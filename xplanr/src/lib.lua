@@ -7,10 +7,11 @@
 
 local Lib={}
 
-function Lib.isa(klass,new)
-  setmetatable(new, klass)
+function Lib.isa(klass,o)
+  o = o or {}
+  setmetatable(o, klass)
   klass.__index = klass
-  return new
+  return o
 end
 
 function Lib.o(t,pre) print(Lib.oo(t,pre))  end

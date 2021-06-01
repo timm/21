@@ -67,6 +67,14 @@ end
 function is_blank(line)
   return line:match('^%s*$') and true
 end
+-- function reflow(str, limit, indent, indent1)
+--    return (str:gsub("%s*\n%s+", "\n")
+--               :gsub("%s%s+", " ")
+--               :gsub("[^\n]+",
+--                     function(line)
+--                        return wrap(line, limit, indent, indent1)
+--                     end))
+-- end
 
 --- ### parse_doc(line)
 --- Parses a documentation block.
