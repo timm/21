@@ -1,3 +1,7 @@
+-- vim: ts=2 sw=2 sts=2 et;
+-- simple explanation/optimizer/data miner/planner
+-- (c) 2021 Tim Menzies (timm@ieee.org) unlicense.org
+
 local Lib=require("lib")
 local o, oo, isa, rogues = Lib.o, Lib.oo, Lib.isa, Lib.rogues
 local rand,seed = Lib.rand, Lib.seed
