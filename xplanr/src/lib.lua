@@ -1,21 +1,28 @@
--- vim: ts=2 sw=2 sts=2 et;
+-- vim: ts=2 sw=2 sts=2 et :
 -- Misc library routines
 -- (c) 2021 Tim Menzies (timm@ieee.org) unlicense.org
 
---- Lib
--- tricks
-
 local Lib={}
 
-function Lib.isa(klass,o)
-  o = o or {}
-  setmetatable(o, klass)
+--- Polymorphism support ----------------------------------
+function Lib.isa(klass, new)
+  new =  new or {}
+  setmetatable( new, klass)
   klass.__index = klass
-  return o
-end
+  return  new end
 
+--- Maths -------------------------------------------------
+-- Round
+
+function Lib.round(num, numDecimalPlaces)
+  local mult = 10^(numDecimalPlaces or 0)
+   return math.floor(num * mult + 0.5) / mult end
+
+--- Print a table -----------------------------------------
+-- Show the print string.
 function Lib.o(t,pre) print(Lib.oo(t,pre))  end
 
+-- Convert a table to a print string.
 function Lib.oo(t,pre,     seen,s,sep,keys, nums)
   seen = seen or {}
   if seen[t] then return "..." end
@@ -40,36 +47,31 @@ function Lib.oo(t,pre,     seen,s,sep,keys, nums)
     sep = ', ' end 
   return tostring(pre) .. '{' .. s ..'}' end
 
+--- Random number generation ------------------------------
+-- Lua's built-in randoms can vary across platforms.
 do
   local seed0 = 10013
   local seed  = seed0
   local mod   = 2147483647.0
   local mult  = 16807.0
   function Lib.rand()  seed= (mult*seed)%mod; return seed/mod end 
-  function Lib.seed(n) seed= n and n or seed0 end
-end
+  function Lib.seed(n) seed= n and n or seed0 end end
 
-function Lib.some(x) return x end
+--- Meta functions ----------------------------------------
+-- Return it
+function Lib.same(x) return x end
 
+-- Modify a list of it.
 function Lib.map(a,f,     b)
   b, f = {}, f or Lib.same
   for i,v in pairs(a or {}) do b[i] = f(v) end 
-  return b
-end 
+  return b end 
 
+-- Deep copy it.
 function Lib.copy(t) 
   return type(t) ~= 'table' and t or Lib.map(t,Lib.copy) end
 
-function Lib.cli(t)
-  local i = 0
-  while i < #t do
-    i, key, now=i+1, args[i], (tonumber(args[i+1]) or args[i+1])
-    key=key:sub(2)
-    if t[key] then
-      i = i+1
-      if type(now) == type(t[key]) then d[key] = now end end end
-  return t end
-
+-- Report rogie locals
 function Lib.rogues(    skip)
   skip = {
     jit=true, utf8=true, math=true, package=true, table=true,
@@ -86,4 +88,19 @@ function Lib.rogues(    skip)
       if k:match("^[^A-Z]") then
         print("-- rogue ["..k.."]") end end end end
 
+--- Handle command-line flags -----------------------------
+-- Update `t` with any relevant flags from the command-line.
+function Lib.cli(t,     i,key,now)
+  i = 0
+  while i < #arg do
+    i = i+1
+    key, now= arg[i], arg[i+1]
+    now = tonumber(now) or now
+    key = key:sub(2)
+    if t[key] then
+      i = i+1
+      if type(now) == type(t[key]) then t[key] = now end end end
+  return Lib.copy(t) end
+
+--- Exports -----------------------------------------------
 return Lib

@@ -7,7 +7,7 @@ local o, oo, isa, rogues = Lib.o, Lib.oo, Lib.isa, Lib.rogues
 local rand,seed = Lib.rand, Lib.seed
 local add,dist,norm
 
-local config = {data="test/data/aa",
+local the = {data="test/data/aa",
                 p=2,
                 seed=1}
 
