@@ -7,8 +7,8 @@ alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias gp="git add *;git commit -am save;git push;git status"
 alias ls="ls -G"
-alias tmux="tmux -f $Ell/etc/tmux-conf "
-alias vi="vim -u $Ell/etc/vimrc "
+alias tmux="tmux -f $Ell/e/tmux-conf "
+alias vi="vim -u $Ell/e/vimrc "
 alias vims="vim +PluginInstall +qall"         
 
 ok() {

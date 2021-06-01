@@ -1,0 +1,3 @@
+Ell=$(dirname $(cd $( dirname "${BASH_SOURCE[0]}" ) && pwd ))
+
+Ell="$Ell" bash --init-file $Ell/e/llrc -i
