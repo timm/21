@@ -11,7 +11,6 @@ alias tmux="$(which tmux) -f $Ell/etc/tmux-conf "
 alias vi="vim -u $Ell/etc/vimrc "
 alias vims="vim +PluginInstall +qall"         
 
-
 docs() { $Ell/etc/moon2md $Ell/src; }
 
 here() { cd $1; basename `pwd`; }
