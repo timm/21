@@ -35,7 +35,7 @@
 ---
 --- Note that although the code block is not shown, the break in documentation
 --- still acts as a paragraph break.
-
+---
 --- Usage
 --- -----
 ---
@@ -43,11 +43,10 @@
 --- documentation to standard output. As an example, lua2md's own documentation
 --- can be generated with:
 ---
----     lua lua2md.lua < lua2md.lua > README.md
-
+---
 --- Implementation
 --- --------------
-
+---
 --- ### doc(line)
 --- If `line` contains documentation, then returns the markdown to output,
 --- otherwise returns `false`.
@@ -67,14 +66,6 @@ end
 function is_blank(line)
   return line:match('^%s*$') and true
 end
--- function reflow(str, limit, indent, indent1)
---    return (str:gsub("%s*\n%s+", "\n")
---               :gsub("%s%s+", " ")
---               :gsub("[^\n]+",
---                     function(line)
---                        return wrap(line, limit, indent, indent1)
---                     end))
--- end
 
 --- ### parse_doc(line)
 --- Parses a documentation block.
@@ -100,24 +91,22 @@ function parse_code(line)
 
   local blanks = {}
   local codeline = code(line)
+  if codeline then print("\n\n```lua") end
   while codeline do
     if is_blank(codeline) then
       table.insert(blanks, codeline)
     else
-      if #blanks ~= 0 then 
-        print("```lua")
+      if #blanks ~= 0 then
         print(table.concat(blanks, '\n'))
-        print("```")
         blanks = {}
       end
       print(codeline)
     end
-
     line = io.read()
     if not line then return end
     codeline = code(line)
   end
-  print()
+  print("```\n\n")
   return parse_doc(line)
 end
 

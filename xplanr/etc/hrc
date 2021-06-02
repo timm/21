@@ -13,6 +13,15 @@ alias tmux="tmux -f $Etc/etc/tmux-conf "
 alias vi="vim -u $Etc/etc/vimrc "
 alias vims="vim +PluginInstall +qall"         
 
+doc() {
+   cd $Etc/src
+   for f in *.lua; do 
+     g=$Etc/docs/${f%.lua}.md
+     echo "# $g ..."
+     cat $f | lua $Etc/etc/lua2md.lua $i > $g
+   done
+}
+
 ok() {
    cd $Etc
    for i in *eg.lua; do 

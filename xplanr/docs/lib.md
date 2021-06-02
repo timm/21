@@ -1,24 +1,45 @@
+
+
+```lua
 -- vim: ts=2 sw=2 sts=2 et :
 -- Misc library routines
 -- (c) 2021 Tim Menzies (timm@ieee.org) unlicense.org
 
 local Lib={}
+```
 
---- Polymorphism support ----------------------------------
+
+Polymorphism support ----------------------------------
+
+
+
+```lua
 function Lib.isa(klass, new)
   new =  new or {}
   setmetatable( new, klass)
   klass.__index = klass
   return  new end
+```
 
---- Maths -------------------------------------------------
+
+Maths -------------------------------------------------
+
+
+
+```lua
 -- Round
 
 function Lib.round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
    return math.floor(num * mult + 0.5) / mult end
+```
 
---- Print a table -----------------------------------------
+
+Print a table -----------------------------------------
+
+
+
+```lua
 -- Concat one table
 function Lib.cat(t,sep) return table.concat(t,sep or ", ") end
 
@@ -49,8 +70,14 @@ function Lib.oo(t,pre,     seen,s,sep,keys, nums)
     else s = s .. sep .. tostring(k) .. '=' .. v end
     sep = ', ' end 
   return tostring(pre) .. '{' .. s ..'}' end
+```
 
---- Files -------------------------------------------------
+
+Files -------------------------------------------------
+
+
+
+```lua
 -- Iterate over the records in a csv file.
 function Lib.csv(file,     stream,tmp,str,row)
   stream = file and io.input(file) or io.input()
@@ -66,8 +93,14 @@ function Lib.csv(file,     stream,tmp,str,row)
     else
       io.close(stream) end end   
 end
+```
 
---- Random number generation ------------------------------
+
+Random number generation ------------------------------
+
+
+
+```lua
 -- Lua's built-in randoms can vary across platforms.
 do
   local seed0 = 10013
@@ -76,8 +109,14 @@ do
   local mult  = 16807.0
   function Lib.rand()  seed= (mult*seed)%mod; return seed/mod end 
   function Lib.seed(n) seed= n and n or seed0 end end
+```
 
---- Meta functions ----------------------------------------
+
+Meta functions ----------------------------------------
+
+
+
+```lua
 -- Return it
 function Lib.same(x) return x end
 
@@ -107,8 +146,14 @@ function Lib.rogues(    skip)
     if not skip[k] then
       if k:match("^[^A-Z]") then
         print("-- rogue ["..k.."]") end end end end
+```
 
---- Handle command-line flags -----------------------------
+
+Handle command-line flags -----------------------------
+
+
+
+```lua
 -- Update `t` with any relevant flags from the command-line.
 function Lib.cli(t,     i,key,now)
   i = 0
@@ -121,6 +166,12 @@ function Lib.cli(t,     i,key,now)
       i = i+1
       if type(now) == type(t[key]) then t[key] = now end end end
   return Lib.copy(t) end
+```
 
---- Exports -----------------------------------------------
+
+Exports -----------------------------------------------
+
+
+
+```lua
 return Lib
