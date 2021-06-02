@@ -3,6 +3,7 @@
 -- (c) 2021 Tim Menzies (timm@ieee.org) unlicense.org
 
 local Lib={}
+Lib.class=require("class")
 
 --- Polymorphism support ----------------------------------
 function Lib.isa(klass, new)
