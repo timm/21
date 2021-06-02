@@ -7,6 +7,7 @@ print("-- lib")
 Lib=require("lib")
 local o,isa,rand = Lib.o, Lib.isa, Lib.rand
 local rand,seed,round = Lib.rand, Lib.seed, Lib.round
+local csv = Lib.csv
 
 do 
   local x= {10,20,{30,{40,50}}}
@@ -37,5 +38,13 @@ do
   assert(this.this ==22,"or else")
   assert(that.that ==220,"or else")
 end
+
+do
+  local n=0
+  for row in csv("data/weather.csv") do 
+    n=n+1
+    assert(#row == 5," size of rows")
+    if  n> 1 then
+      assert(type(row[2])=="number","coercion") end end end 
 
 Lib.rogues()

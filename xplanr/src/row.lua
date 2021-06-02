@@ -2,10 +2,11 @@
 -- Handling  one example in a table.
 -- (c) 2021 Tim Menzies (timm@ieee.org) unlicense.org
 
+local Lib=require("lib")
 local Row={}
 
-function Row.new(t)
-  return isa(Row, {_tab=t, cells={}}) end
+function Row.new(t,cells)
+  return Lib.isa(Row, {_tab=t, cells=cells or {}}) end
 
 function Row:dist(other,cols, the)
   local d,n=0,1E-32

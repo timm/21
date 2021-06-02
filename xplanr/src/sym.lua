@@ -10,7 +10,7 @@ function Sym.new(at,txt)
                        n=0, seen={}, most=0, mode=nil}) end
 
 function Sym:add(x,   n)
-  local d = (self.seen[x] or 0) + n
+  local d = (self.seen[x] or 0) + (n or 1)
   self.seen[x] = d
   if d > self.most then self.most, self.mode = d, x end end
 
@@ -24,6 +24,6 @@ function Sym:ent(   e,p)
 function Sym:mid(x)    return self.mode  end
 function Sym:norm(x)   return x end
 function Sym:dist(x,y) return x==y and 0 or 1 end
-function Sym:spread(x) return self:ent() end
+function Sym:spread()  return self:ent() end
 
 return Sym

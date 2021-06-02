@@ -60,7 +60,7 @@ function Lib.csv(file,     stream,tmp,str,row)
       str = tmp:gsub("[\t\r ]*",""):gsub("#.*","")
       row = {}
       for cell in str:gmatch("([^,]+)") do 
-        row[#row+1] = tonumber(cell) or cell end
+        row[#row+1] = Lib.coerce(cell) end
       tmp= io.read()
       if #row > 0 then return row end
     else
@@ -108,14 +108,20 @@ function Lib.rogues(    skip)
       if k:match("^[^A-Z]") then
         print("-- rogue ["..k.."]") end end end end
 
+-- Coerce a string to its right type.
+function Lib.coerce(x)
+  if  x=="true"  then return true  end
+  if  x=="false" then return false  end
+  return tonumber(x) or x
+end
+
 --- Handle command-line flags -----------------------------
 -- Update `t` with any relevant flags from the command-line.
 function Lib.cli(t,     i,key,now)
   i = 0
   while i < #arg do
     i = i+1
-    key, now= arg[i], arg[i+1]
-    now = tonumber(now) or now
+    key, now= arg[i], Lib.coerce(arg[i+1])
     key = key:sub(2)
     if t[key] then
       i = i+1
