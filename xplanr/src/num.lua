@@ -7,7 +7,7 @@ local Num = Lib.class(Col)
 
 function Num:_init(at,txt) 
   self:super(at,txt)
-  self.mu,self.m2,self.lo,self.hi =  0,0,1E31,-1E31 
+  self.mu,self.m2,self.lo,self.hi = 0,0,1E31,-1E31 
 end
 
 function Num:add1(x,_) 
