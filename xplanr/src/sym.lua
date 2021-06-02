@@ -5,7 +5,6 @@
 local Lib,Col = require("lib"),require("col")
 local Sym = Lib.class(Col)
 
-
 function Sym:_init(at,txt) 
   self:super(at,txt)
   self.seen,self.most,self.mode={},0,nil end
@@ -22,9 +21,9 @@ function Sym:ent(   e,p)
     e = e-p*math.log(p)/math.log(2) end 
   return e end
 
-function Sym:mid(x)    return self.mode  end
+function Sym:mid(x)     return self.mode  end
 function Sym:norm1(x)   return x end
 function Sym:dist1(x,y) return x==y and 0 or 1 end
-function Sym:spread()  return self:ent() end
+function Sym:spread()   return self:ent() end
 
 return Sym
