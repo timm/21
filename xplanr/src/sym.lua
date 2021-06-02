@@ -7,7 +7,7 @@ local Sym = Lib.class(Col)
 
 function Sym:_init(at,txt) 
   self:super(at,txt)
-  self.seen,self.most,self.mode={},0,nil end
+  self.seen,self.most,self.mode = {},0,nil end
 
 function Sym:add1(x,   n)
   local d = (self.seen[x] or 0) + (n or 1)
