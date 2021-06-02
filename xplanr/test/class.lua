@@ -3,11 +3,13 @@
 -- (c) 2021 Tim Menzies (timm@ieee.org) unlicense.org
 
 package.path = '../src/?.lua;' .. package.path 
+local Thing=require("thing")
 local Lib=require("lib")
 local class=Lib.class
 
-Animal =class()
+Animal =class(Thing)
 Animal.sound = '?'
+
 
 function Animal:_init(name)
     self.name = name
@@ -23,6 +25,7 @@ Cat.sound = 'meow'
 felix = Cat('felix')
 
 print(felix:speak())
+print(felix)
 print(felix._base)
 print(Cat.classof(felix))
 print(Animal.classof(felix))
