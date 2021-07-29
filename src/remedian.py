@@ -22,13 +22,13 @@ class Remedian:
 
 def r3(x): return round(x,4)
 
-for _ in range(1000):
+for _ in range(50):
   r=Remedian(max=32)
   all=[]
   for _ in range(256): 
     n=random.random()
     r.add(n); r.median()
-    #all += [n]; all.sort(); per(all,.5)
-  #got,want=r.median(), per(sorted(all),.5)
-  #print(*[r3(x) for x in [int(100*abs(got-want)/want),got,want]])
+    all += [n] # all.sort(); per(all,.5)
+  got,want=r.median(), per(sorted(all),.5)
+  print(*[r3(x) for x in [100*abs(got-want)/want,got,want]])
 
