@@ -1,11 +1,12 @@
 import random
 def per(a,p=.5): return a[int(p*len(a))]
+def dot(x): print(x,end="")
 
 class Median:
   def __init__(i,n=16): i._all,i.n,i.kid,i.bad = [],n,None,True
   def val(i): return i.kid.val() if i.kid else per(i.all())
   def all(i): 
-    if i.bad: i._all.sort()
+    if i.bad: dot("!");  i._all.sort()
     i.bad = False
     return i._all
   def add(i,x):
