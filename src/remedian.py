@@ -7,7 +7,7 @@ class Ordered:
   def add(i,x):    i._all += [x]; i.sorted=False
   def median(i):   return per(i.all(),.5)
   def all(i):
-    if not i.sorted: i._all.sort();i.sorted=True
+    if not i.sorted: print("+",end="");i._all.sort();i.sorted=True
     return i._all
 
 class Remedian:
