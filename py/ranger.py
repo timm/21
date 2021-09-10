@@ -78,23 +78,21 @@ def cluster(d,depth=4):
     random.shuffle(rows)
     rows = sorted([(dist(d,r1,r2),r2) for r2 in rows[:128]], key=first)
     return rows[int(.9*len(rows))]
-  #---------------- 
-  def cosine(row,l,r,c):
-     return (dist(d,row,l)**2 + c**2 - dist(d,row,r)**2)/(2*c+1E-32) 
-  #---------------- 
+
   def recurse(rows,depth):
-    if depth < 1 or len(rows) < 4:
+    if depth < 1 or len(rows) < 9: # 4*2+1
       out += [o(scored=[],has=rows)]
     else:
       one  = random.choose(rows)
       _,l  = far(rows,one)
       c,r  = far(rows,l)
-      for row in rows: row.x = cosine(row,l,r,c)
+      for row in rows: 
+        row.x = (dist(d,row,l)**2 + c**2 - dist(d,row,r)**2)/(2*c+1E-32) 
       rows = sorted(rows, key=lambda row: row.x)
       mid  = len(rows)//2
       recurse(rows[:mid], depth - 1)
       recurse(rows[mid:], depth - 1)
-  #---------------- 
+
   out = []
   recurse(d.rows,depth)
   return out

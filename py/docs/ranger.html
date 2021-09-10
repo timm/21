@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ranger.py</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>ranger.py</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              <p>– vim: ts=2 sw=2 sts=2 et :</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> re
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">o</span>:
+  <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">i,**kv</span>)  : i.__dict__.update(**kv)
+  <span class="hljs-keyword">def</span> <span class="hljs-title function_">__repr__</span>(<span class="hljs-params">i</span>): <span class="hljs-keyword">return</span> i.__class__.__name__+<span class="hljs-string">&quot;{&quot;</span>+dstring(i.__dict__)+<span class="hljs-string">&quot;}&quot;</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">dstring</span>(<span class="hljs-params">d,  skip=<span class="hljs-string">&quot;_&quot;</span></span>):
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot; &quot;</span>.join([<span class="hljs-string">f&quot;:<span class="hljs-subst">{k}</span> <span class="hljs-subst">{v}</span>&quot;</span> <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">in</span> <span class="hljs-built_in">sorted</span>(d.items()) <span class="hljs-keyword">if</span> k[<span class="hljs-number">0</span>] != skip])
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">csv</span>(<span class="hljs-params">file, sep=<span class="hljs-string">&quot;,&quot;</span>, ignore=<span class="hljs-string">r&#x27;([\n\t\r ]|#.*)&#x27;</span></span>):
+  <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(file) <span class="hljs-keyword">as</span> fp:
+    <span class="hljs-keyword">for</span> s <span class="hljs-keyword">in</span> fp:
+      s=re.sub(ignore,<span class="hljs-string">&quot;&quot;</span>,s)
+      <span class="hljs-keyword">if</span> s:
+        <span class="hljs-keyword">yield</span> s.split(sep)
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">num</span>(<span class="hljs-params">x</span>): <span class="hljs-keyword">return</span> x <span class="hljs-keyword">if</span> x == <span class="hljs-string">&quot;?&quot;</span> <span class="hljs-keyword">else</span> <span class="hljs-built_in">float</span>(x)
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">data</span>(<span class="hljs-params">file</span>):
+  d = o(cols=[], rows=[], close={}, closest=<span class="hljs-number">0</span>, x={}, y={},ranges={})
+  <span class="hljs-keyword">for</span> <span class="hljs-built_in">id</span>,row <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(csv(file)):
+    <span class="hljs-keyword">if</span> d.cols:
+      d.rows += o(<span class="hljs-built_in">id</span>=<span class="hljs-built_in">id</span>, ranges=[], cells=[f(x) <span class="hljs-keyword">for</span> f,x <span class="hljs-keyword">in</span> <span class="hljs-built_in">zip</span>(d.cols,row)])
+      d.close[<span class="hljs-built_in">id</span>]={}
+    <span class="hljs-keyword">else</span>:
+      <span class="hljs-keyword">for</span> c,x <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(row):
+        d.cols +=  [num <span class="hljs-keyword">if</span> x[<span class="hljs-number">0</span>].isupper() <span class="hljs-keyword">else</span> <span class="hljs-built_in">str</span>]
+        <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;?&quot;</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> x:
+          what = d.y <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;+&quot;</span> <span class="hljs-keyword">in</span> x <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;-&quot;</span> <span class="hljs-keyword">in</span> x <span class="hljs-keyword">or</span> <span class="hljs-string">&quot;!&quot;</span> <span class="hljs-keyword">in</span> x <span class="hljs-keyword">else</span> d.x
+          what[c] = c
+  <span class="hljs-keyword">return</span> d
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">ranges</span>(<span class="hljs-params">d</span>):     
+  <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> d.x:
+    <span class="hljs-keyword">if</span> d.cols[c] == num: 
+      lst         = [(row[c],row) <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> d.rows <span class="hljs-keyword">if</span> row[c] != <span class="hljs-string">&quot;?&quot;</span>]
+      d.ranges[c] = [closer(d,range1) <span class="hljs-keyword">for</span> range1 <span class="hljs-keyword">in</span> ranges1(lst,col=col)]
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">ranges1</span>(<span class="hljs-params">lst,col=<span class="hljs-number">0</span></span>):
+  lst     = <span class="hljs-built_in">sorted</span>(lst, key=first)
+  iota    = sd(lst, key=first) * <span class="hljs-number">.35</span>
+  big     = <span class="hljs-built_in">len</span>(lst)**<span class="hljs-number">.5</span>
+  lo      = x[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]
+  range1  = o(col=col, lo=lo, hi=lo, has=[])
+  out    += [range1]
+  <span class="hljs-keyword">for</span> i,(x,row) <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(lst):
+    <span class="hljs-keyword">if</span> i &lt; <span class="hljs-built_in">len</span>(lst) - big:
+      <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(range1.has) &gt;= big:
+         <span class="hljs-keyword">if</span> range1.hi - range1.low &gt; iota:
+           <span class="hljs-keyword">if</span> x != lst[i+<span class="hljs-number">1</span>][<span class="hljs-number">0</span>]:
+             range1 = o(col=col, lo=x, hi=x, has=[])
+             out += [range1]
+    range1.hi   = x 
+    range1.has += [row]
+  <span class="hljs-keyword">return</span> out
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">closer</span>(<span class="hljs-params">d, range1</span>):
+  <span class="hljs-keyword">for</span> row1 <span class="hljs-keyword">in</span> one.has:
+    <span class="hljs-keyword">for</span> row2 <span class="hljs-keyword">in</span> one.has:
+      i1,i2 = <span class="hljs-built_in">id</span>(row1), <span class="hljs-built_in">id</span>(row2)
+      <span class="hljs-keyword">if</span> i1 &lt; i2:
+        old = d.close[i1].get(i2,<span class="hljs-number">0</span>)
+        new = d.close[i1][i2] = old + <span class="hljs-built_in">len</span>(one.has)/<span class="hljs-built_in">len</span>(lst)
+        <span class="hljs-keyword">if</span> new &gt; d.closest: 
+          d.closest = new
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">dist</span>(<span class="hljs-params">d, row1,row2</span>):
+   i1,i2 = <span class="hljs-built_in">id</span>(row1), <span class="hljs-built_in">id</span>(row2)
+   <span class="hljs-keyword">if</span> i1 &gt; i2: i1,i2 = i2,i1
+   <span class="hljs-keyword">if</span> i1 <span class="hljs-keyword">in</span> d.close:
+     <span class="hljs-keyword">if</span> i2 <span class="hljs-keyword">in</span> d.close[i2]:
+       <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> - d.close[i1][i2] / d.closest
+   <span class="hljs-keyword">return</span> <span class="hljs-number">1</span> 
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">cluster</span>(<span class="hljs-params">d,depth=<span class="hljs-number">4</span></span>):
+  <span class="hljs-keyword">def</span> <span class="hljs-title function_">far</span>(<span class="hljs-params">rows, r1</span>):
+    random.shuffle(rows)
+    rows = <span class="hljs-built_in">sorted</span>([(dist(d,r1,r2),r2) <span class="hljs-keyword">for</span> r2 <span class="hljs-keyword">in</span> rows[:<span class="hljs-number">128</span>]], key=first)
+    <span class="hljs-keyword">return</span> rows[<span class="hljs-built_in">int</span>(<span class="hljs-number">.9</span>*<span class="hljs-built_in">len</span>(rows))]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">def</span> <span class="hljs-title function_">cosine</span>(<span class="hljs-params">row,l,r,c</span>):
+     <span class="hljs-keyword">return</span> (dist(d,row,l)**<span class="hljs-number">2</span> + c**<span class="hljs-number">2</span> - dist(d,row,r)**<span class="hljs-number">2</span>)/(<span class="hljs-number">2</span>*c+<span class="hljs-number">1E-32</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">def</span> <span class="hljs-title function_">recurse</span>(<span class="hljs-params">rows,depth</span>):
+    <span class="hljs-keyword">if</span> depth &lt; <span class="hljs-number">1</span> <span class="hljs-keyword">or</span> <span class="hljs-built_in">len</span>(rows) &lt; <span class="hljs-number">4</span>:
+      out += [o(scored=[],has=rows)]
+    <span class="hljs-keyword">else</span>:
+      one  = random.choose(rows)
+      _,l  = far(rows,one)
+      c,r  = far(rows,l)
+      <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> rows: row.x = cosine(row,l,r,c)
+      rows = <span class="hljs-built_in">sorted</span>(rows, key=<span class="hljs-keyword">lambda</span> row: row.x)
+      mid  = <span class="hljs-built_in">len</span>(rows)//<span class="hljs-number">2</span>
+      recurse(rows[:mid], depth - <span class="hljs-number">1</span>)
+      recurse(rows[mid:], depth - <span class="hljs-number">1</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  out = []
+  recurse(d.rows,depth)
+  <span class="hljs-keyword">return</span> out
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">first</span>(<span class="hljs-params">a</span>): <span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>]
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">same</span>(<span class="hljs-params">x</span>): <span class="hljs-keyword">return</span> x
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">per</span>(<span class="hljs-params">a,p=<span class="hljs-number">0.5</span></span>) : <span class="hljs-keyword">return</span> a[<span class="hljs-built_in">int</span>(p*<span class="hljs-built_in">len</span>(a))]
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">sd</span>(<span class="hljs-params">a,key=same</span>): 
+  <span class="hljs-keyword">return</span> (key(per(a,<span class="hljs-number">.9</span>)) - key(per(a,<span class="hljs-number">.1</span>))) / <span class="hljs-number">2.56</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
