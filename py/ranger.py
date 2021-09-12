@@ -1,129 +1,206 @@
 #!/usr/bin/env python3
-# -- vim: ts=2 sw=2 sts=2 et :
-import re
+# vim: ts=2 sw=2 sts=2 et :
+"""
+Cluster  + Contrast
+"""
+import re, random
+from lib import o,csv,first
+r = random.random
+  
+class Skip(o):
+  "Make something that ignores everything it sees."
+  def __init__(i,_,n=0,s=""): i.n,i.at,i.txt = 0,n,s
+  def add(i,x):  return  x
+  def prep(i,x): return x
 
-class o: 
-  "knows  how to print itself"
-  def __init__(i, **kv)  : 
-    "initialize"
-    i.__dict__.update(  **kv)
-  def __repr__(i): return i.__class__.__name__+"{"+dstring(i.__dict__)+"}"
+class Sym(o):
+  "Symbol counter."
+  def __init__(i,my={},n=0,s=""): i.n,i.at,i.txt,i.has = 0,n,s,{}
 
-def num(x): return x if x == "?" else float(x)
+  def add(i,x): 
+    "Update symbol counts."
+    if x != "?": 
+      i.n += 1
+      i.has[x] = 1 + i.has.get(x,0)
+    return x
 
-def data(file):
-  "Create rows and columns from a csv file."
-  d = o(cols=[], rows=[], close={}, closest=0, x={}, y={},ranges={})
-  for id,row in enumerate(csv(file)):
-    if d.cols:
-      d.rows += o(id=id, ranges=[], cells=[f(x) for f,x in zip(d.cols,row)])
-      d.close[id]={}
+  def dist(i,x,y):
+    "Distance between two symbols"
+    return 1 if x=="?" and y=="?" else (0 if x==y else 1)
+
+  def prep(i,x): 
+    "Coerce `x` to a string."
+    return x
+
+
+class Num(o):
+  "Numeric counters."
+  def __init__(i, my=o(max=256), n=0, s=""):
+    i.n, i.at, i.txt, i._all =  0, n, s, []
+    i.old, i.max, i.lo, i.hi = True, my.max, 1E32, -1E32  
+    i.w= -1 if "-" in s else 1
+
+  def add(i,x): 
+    """Keep a representative sample of the `x` values as
+    well as the `lo` and `hi`  value  seen so far."""
+    if x != "?":
+      i.n += 1
+      if x > i.hi: i.hi = x
+      if x < i.lo: i.lo = x
+      if len(i._all) < i.max: 
+        i.old = True
+        i._all += [x]
+      elif r() < i.max/i.n: 
+        i.old = True
+        i._all[int(r()*len(i._all))] = x
+    return  x
+
+  def all(i):
+    "Return the stored numbers, sorted."
+    if i.old: i._all.sort()
+    i.old = False
+    return i._all
+
+  def dist(i,x,y):
+    "Distance between two numbers."
+    def norm(z): return (z-i.lo) / (i.hi - i.lo +1E-31)
+    if x=="?" and y=="?": return 1
+    if x=="?": 
+      y = norm(y); x = 0 if y > 0.5 else 1
+    elif y=="?": 
+      x = norm(x); y = 0 if x > 0.5 else 1
     else:
-      for c,x in enumerate(row):
-        d.cols +=  [num if x[0].isupper() else str]
-        if "?" not in x:
-          what = d.y if "+" in x or "-" in x or "!" in x else d.x
-          what[c] = c
-  return d
+      x,y = norm(x), norm(y)
+    return abs(x - y)
 
-def ranges(d):     
-  for c in d.x:
-    if d.cols[c] == num: 
-      lst        = [(row[c],row) for row in d.rows if row[c] != "?"]
-      d.ranges[c]= [closer(d,n,range1) for n,range1 in 
-                    enumerate(ranges1(lst,col=col))]
+  def mid(i):  
+    "Return  the mid point of the numbers."
+    return i.per()
 
-def ranges1(lst,col=0):
-  "Break list  "
-  lst     = sorted(lst, key=first)
-  iota    = sd(lst, key=first) * .35
-  big     = int( max(len(lst)/16, len(lst)**.5))
-  lo      = x[0][0]
-  range1  = o(col=col, lo=lo, hi=lo, has=[])
-  out    += [range1]
-  for i,(x,row) in enumerate(lst):
-    if i < len(lst) - big:
-      if len(range1.has) >= big:
-         if range1.hi - range1.low > iota:
-           if x != lst[i+1][0]:
-             range1 = o(col=col, lo=x, hi=x, has=[])
-             out += [range1]
-    range1.hi   = x 
-    range1.has += [row]
-  return out
+  def per(i,p=.5,lo=None,hi=None):
+    "Return the item that is `p-th` beteeen `lo` and `hi`"
+    a  = i.all()
+    lo = lo or 0
+    hi = hi or len(a)
+    return a[int(lo + p*(hi - lo))]
 
-def dist(d, row1,row2):
-   i1,i2 = id(row1), id(row2)
-   if i1 > i2: i1,i2 = i2,i1
-   if i1 in d.close:
-     if i2 in d.close[i2]:
-       return 1 - d.close[i1][i2] / d.closest
-   return 1 
+  def prep(i,x): 
+    "Coerce `x` to a float."
+    return x if x=="?" else float(x)
 
-def cluster(d,depth=4):
-  "Divide `d.rows` into a tree of  `depth`."
-  def far(rows, r1):
+  def sd(i): 
+    """<img align=right width=300 
+        src="https://miro.medium.com/max/1400/1*IZ2II2HYKeoMrdLU5jW6Dw.png">
+    - Plus or minus (1,2) sd is (66%,95%) of the mass. 
+    - So plus or minus 1.28 is 90% of the mass. 
+    - So one standard deviation is 90% of the mass divided by 2.56.<br clear=all>"""
+    return (i.per(.9) - i.per(.1)) / 2.56
+
+class Row(o):
+  def __init__(i,lst): i.cells, i.ranges = lst,[None]*len(lst)
+
+class Data(o):
+  def __init__(i,my): 
+    i.cols, i.rows, i.x, i.y = [],[],[],[]
+    i.my = my
+
+  def load(i,file): 
+    "Load data from a csv file in a Data instance."
+    for lst in csv(file): i.row(lst)
+    return i
+
+  def row(i,lst):
+    """Turn `lst` into either a `header` (if it is row0) 
+    or a `row` (for every other  line)."""
+    if i.cols: i.rows += [Row([c.add(c.prep(x)) for c,x in zip(i.cols,lst)])]
+    else: i.header(lst)
+
+  def header(i,lst):
+    "Create columns. Store dependent and independent columns in `x` and `y`"
+    for c,x in enumerate(lst):
+      what= Skip if "?" in x else (Num if x[0].isupper() else Sym)
+      new = what(i.my,c,x)
+      i.cols += [new]
+      if "?" not in x:
+        what = i.y if ("+" in x or "-" in x or "!" in x) else i.x
+        what += [new]
+
+  def dist(i,r1,r2):
+    d, n = 0, 1E-32
+    for col in i.x:
+      inc = col.dist( r1.cells[col.at], r2.cells[col.at] )
+      d  += inc**i.my.p
+      n  +=1
+    return (d/n)**(1/i.my.p)
+
+  def far(i, rows, r1):
     random.shuffle(rows)
-    rows = sorted([(dist(d,r1,r2),r2) for r2 in rows[:128]], key=first)
-    return rows[int(.9*len(rows))]
+    rows = sorted([(i.dist(r1,r2),r2) for r2 in rows[:128]], key=first)
+    return rows[int(i.my.far*len(rows))]
+ 
+  """
+  ---------------
+  asdad
+  """
+  def polarize(i,rows,d):
+    "Separate rows via their distance to two distant points."
+    zero  = random.choice(rows)
+    _,a   = i.far(rows, zero)
+    c,b   = i.far(rows, a)
+    print(' '*d,int(100*c))
+    for r in rows: 
+      r.x = (i.dist(r,a)**2 + c**2 - i.dist(r,b)**2)/(2*c)
+    rows  = sorted(rows, key=lambda row: row.x)
+    mid   = len(rows)//2
+    return rows[:mid], rows[mid:]
 
-  def recurse(rows,depth):
-    if depth < 1 or len(rows) < 9: # 4*2+1
-      out += [o(scored=[],has=rows)]
-    else:
-      one  = random.choose(rows)
-      _,l  = far(rows,one)
-      c,r  = far(rows,l)
-      for row in rows: 
-        row.x = (dist(d,row,l)**2 + c**2 - dist(d,row,r)**2)/(2*c+1E-32) 
-      rows = sorted(rows, key=lambda row: row.x)
-      mid  = len(rows)//2
-      recurse(rows[:mid], depth - 1)
-      recurse(rows[mid:], depth - 1)
+  def cluster(i):
+    "Divide `d.rows` into a tree of  `depth`."
+    out = []
+    def div(rows, depth):
+      if depth > i.my.depth  or len(rows) < i.my.end:
+        out.append(Cluster(rows))
+      else:
+        left, right  = i.polarize(rows,depth)
+        div(left,  depth + 1)
+        div(right, depth + 1)
+    div(i.rows, 1)
+    return out
 
-  out = []
-  recurse(d.rows,depth)
-  return out
+class Cluster(o):
+  def __init__(i,has): i.has = has
 
-def csv(file, sep=",", ignore=r'([\n\t\r ]|#.*)'):
-  "Reads comma repeated files, one line  at a time."
-  with open(file) as fp:
-    for s in fp:
-      s=re.sub(ignore,"",s)
-      if s:
-        yield s.split(sep)
-
-def first(a): 
-  "First item" 
-  return a[0]
-
-def same(x): 
-  "Return arg"  
-  return x
-
-def per(a,p=0.5): 
-  "Return pth percentile" 
-  return a[int(p*len(a))]
-
-def sd(a,key=same): 
-  "Standard deviation of  list  is (.9 - .1)/2.56"
-  return (key(per(a,.9)) - key(per(a,.1))) / 2.56 
-
-def dstring(d,  skip="_"):
-  "String of dictionary :key values, sorted by  key, skipping private keys"
-  return " ".join([f":{k} {v}" for k,v in sorted(d.items()) if k[0] != skip])
-
-def cli(usage,  config):
-  p = argparse.ArgumentParser(prog=usage, description=__doc__, 
-                formatter_class=argparse.RawTextHelpFormatter)
-  add   = p.add_argument
-  used  = {}
-  for k, (_, b4, h) in sorted(config.items()):
-    used[k[0]] = c = k[0] if k[0] in used else k[0].lower()
-    if b4 == False:
-      add("-"+c, dest=k, default=False, help=h, action="store_true")
-    else:
-      add("-"+c, dest=k, default=b4, help=h + " [" + str(b4) + "]",
-           type=type(b4), metavar=k)
-  return o( **p.parse_args().__dict__ )
+# def ranges(d):     
+#   for c in d.x:
+#     if d.cols[c] == num: 
+#       lst        = [(row[c],row) for row in d.rows if row[c] != "?"]
+#       d.ranges[c]= [closer(d,n,range1) for n,range1 in 
+#                     enumerate(ranges1(lst,col=col))]
+#
+# def ranges1(lst,col=0):
+#   "Break list  "
+#   lst     = sorted(lst, key=first)
+#   iota    = sd(lst, key=first) * .35
+#   big     = int( max(len(lst)/16, len(lst)**.5))
+#   lo      = x[0][0]
+#   range1  = o(col=col, lo=lo, hi=lo, has=[])
+#   out    += [range1]
+#   for i,(x,row) in enumerate(lst):
+#     if i < len(lst) - big:
+#       if len(range1.has) >= big:
+#          if range1.hi - range1.low > iota:
+#            if x != lst[i+1][0]:
+#              range1 = o(col=col, lo=x, hi=x, has=[])
+#              out += [range1]
+#     range1.hi   = x 
+#     range1.has += [row]
+#   return out
+#
+# def dist(d, row1,row2):
+#    i1,i2 = id(row1), id(row2)
+#    if i1 > i2: i1,i2 = i2,i1
+#    if i1 in d.close:
+#      if i2 in d.close[i2]:
+#        return 1 - d.close[i1][i2] / d.closest
+#    return 1 
 
