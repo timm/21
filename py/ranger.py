@@ -144,12 +144,11 @@ class Data(o):
   """
   def polarize(i,rows,d):
     "Separate rows via their distance to two distant points."
-    zero  = random.choice(rows)
-    _,a   = i.far(rows, zero)
-    c,b   = i.far(rows, a)
-    print(' '*d,int(100*c))
+    anywhere = random.choice(rows)
+    _,north  = i.far(rows, anywhere)
+    c,south  = i.far(rows, north)
     for r in rows: 
-      r.x = (i.dist(r,a)**2 + c**2 - i.dist(r,b)**2)/(2*c)
+      r.x = (i.dist(r,north)**2 + c**2 - i.dist(r,south)**2)/(2*c)
     rows  = sorted(rows, key=lambda row: row.x)
     mid   = len(rows)//2
     return rows[:mid], rows[mid:]

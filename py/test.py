@@ -5,6 +5,7 @@ from cli import cli
 
 class Eg:
   crash = 0
+  def show(my): print(my)
   def works(my): assert True
   def fails(my): assert 1/0
   def _noop(my):  return 1
